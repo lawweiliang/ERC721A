@@ -13,6 +13,7 @@ contract DayDream is Ownable, ERC721A, ReentrancyGuard {
     using Strings for uint256;
 
     uint256 public constant price = 0.05 ether;
+    uint256 public constant whiteListPrice = 0.01 ether;
     uint256 public constant maxSupply = 6666;
     uint256 public constant maxMintPerUser = 20;
     string public baseTokenURI;
@@ -49,7 +50,7 @@ contract DayDream is Ownable, ERC721A, ReentrancyGuard {
             "DayDream: can not hold more than 5"
         );
         require(
-            msg.value >= (price * _purchaseNum),
+            msg.value >= (whiteListPrice * _purchaseNum),
             "DayDream: price is incorrect"
         );
 
