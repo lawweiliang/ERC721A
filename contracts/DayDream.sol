@@ -20,8 +20,9 @@ contract DayDream is Ownable, ERC721A, ReentrancyGuard {
     string public baseExtension = ".json";
     bool public paused = false;
 
+    //Change the unix time accordingly
     uint256 public preSaleTime = 1636682400;
-    uint256 public publicSaleTime = 1637028000;
+    uint256 public publicSaleTime = 1636682400;
 
     mapping(address => bool) public whiteList;
     mapping(uint256 => string) private _tokenURIs;
