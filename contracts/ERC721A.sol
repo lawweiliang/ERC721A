@@ -212,7 +212,7 @@ contract ERC721A is
    * @dev See {IERC721Metadata-tokenURI}.
    */
   function tokenURI(uint256 tokenId)
-    public
+    public  
     view
     virtual
     override

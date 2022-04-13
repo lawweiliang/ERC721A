@@ -17,6 +17,7 @@ contract DayDream is Ownable, ERC721A, ReentrancyGuard {
     uint256 public constant maxSupply = 6666;
     uint256 public constant maxMintPerUser = 20;
     string public baseTokenURI;
+    string public baseExtension = ".json";
     bool public paused = false;
 
     uint256 public preSaleTime = 1636682400;
@@ -30,9 +31,9 @@ contract DayDream is Ownable, ERC721A, ReentrancyGuard {
     constructor(
         string memory _name,
         string memory _symbol,
-        string memory _uri
+        string memory _initBaseURI
     ) ERC721A(_name, _symbol, maxMintPerUser, maxSupply) {
-        baseTokenURI = _uri;
+        setBaseURI(_initBaseURI);
     }
 
     function preSale(uint8 _purchaseNum) external payable onlyWhiteList {
@@ -107,6 +108,14 @@ contract DayDream is Ownable, ERC721A, ReentrancyGuard {
         publicSaleTime = _time;
     }
 
+    function setBaseURI(string memory _URI) public onlyOwner {
+        baseTokenURI = _URI;
+    }
+
+    function setBaseExtension(string memory _newBaseExtension) external onlyOwner {
+        baseExtension = _newBaseExtension;
+    }
+
     function pauseSale() external onlyOwner {
         paused = !paused;
     }
@@ -118,8 +127,6 @@ contract DayDream is Ownable, ERC721A, ReentrancyGuard {
     }
 
     function withdraw() external onlyOwner {
-        // payable(owner()).transfer(address(this).balance);
-
         uint ethBalance = address(this).balance;
 
         uint section1Earn = (ethBalance / 1000) * 700;
@@ -136,7 +143,7 @@ contract DayDream is Ownable, ERC721A, ReentrancyGuard {
         payable(section3).transfer(section3Earn);
     }
 
-     function tokensOfOwner(address _owner)
+    function tokensOfOwner(address _owner)
         external
         view
         returns (uint256[] memory)
@@ -153,68 +160,30 @@ contract DayDream is Ownable, ERC721A, ReentrancyGuard {
             return result;
         }
     }
-
-    /* function tokensOfOwner(address _owner)
-        external
-        view
-        returns (uint256[] memory)
-    {
-        uint256 tokenCount = balanceOf(_owner);
-        if (tokenCount == 0) {
-            return new uint256[](0);
-        } else {
-            uint256[] memory result = new uint256[](tokenCount);
-            uint256 index;
-            for (index = 0; index < tokenCount; index++) {
-                result[index] = tokenOfOwnerByIndex(_owner, index);
-            }
-            return result;
-        }
-    }
-
-    function childContractOfToken(uint256 _tokenId)
-        external
-        view
-        returns (address[] memory)
-    {
-        uint256 childCount = totalChildContracts(_tokenId);
-        if (childCount == 0) {
-            return new address[](0);
-        } else {
-            address[] memory result = new address[](childCount);
-            uint256 index;
-            for (index = 0; index < childCount; index++) {
-                result[index] = childContractByIndex(_tokenId, index);
-            }
-            return result;
-        }
-    }
-
-    function childTokensOfChildContract(uint256 _tokenId, address _childAddr)
-        external
-        view
-        returns (uint256[] memory)
-    {
-        uint256 tokenCount = totalChildTokens(_tokenId, _childAddr);
-        if (tokenCount == 0) {
-            return new uint256[](0);
-        } else {
-            uint256[] memory result = new uint256[](tokenCount);
-            uint256 index;
-            for (index = 0; index < tokenCount; index++) {
-                result[index] = childTokenByIndex(_tokenId, _childAddr, index);
-            }
-            return result;
-        }
-    } */
 
     function _baseURI() internal view virtual override returns (string memory) {
       return baseTokenURI;
     }
 
-    function setBaseURI(string memory _baseURI) external onlyOwner {
-        baseTokenURI = _baseURI;
-    }
+
+    function tokenURI(uint256 tokenId)
+    public
+    view
+    virtual
+    override
+    returns (string memory)
+  {
+    require(
+      _exists(tokenId),
+      "ERC721Metadata: URI query for nonexistent token"
+    );
+    
+
+    string memory currentBaseURI = _baseURI();
+    return bytes(currentBaseURI).length > 0
+        ? string(abi.encodePacked(currentBaseURI, tokenId.toString(), baseExtension))
+        : "";
+  }
 
     function numberMinted(address owner) public view returns (uint256) {
         return _numberMinted(owner);
